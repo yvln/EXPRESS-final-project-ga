@@ -14,16 +14,16 @@ router.get('/',
 	}
 );
 
-router.get('/:id/:user_level',
-	Games.findById,
-	(req, res) => {
-		console.log('in games GET findById');
-		const { game } = res.locals;
-		res.json({
-			game: game
-		});
-	}
-);
+// router.get('/:id/:user_level',
+// 	Games.findById,
+// 	(req, res) => {
+// 		console.log('in games GET findById');
+// 		const { game } = res.locals;
+// 		res.json({
+// 			game: game
+// 		});
+// 	}
+// );
 
 router.get('/renderQuestion/:id/:user_level',
 	Games.renderQuestion,
@@ -35,14 +35,44 @@ router.get('/renderQuestion/:id/:user_level',
 	}
 );
 
-// router.post('/lessTry',
-// 	Games.oneLessTry(number_try_game, user_id),
-// 	(req, res) => {
-// 		const { number_try } = res.locals;
-// 		res.json({
-// 			number_try: number_try
-// 		});
-// 	}
-// );
+router.post('/updateNumberTry',
+	Games.updateNumberTry,
+	(req, res) => {
+		const { new_nb_try } = res.locals;
+		res.json({
+			new_nb_try: new_nb_try
+		});
+	}
+);
+
+router.post('/updateMaxScore',
+	Games.updateMaxScore,
+	(req, res) => {
+		const { new_max_score } = res.locals;
+		res.json({
+			new_max_score: new_max_score
+		});
+	}
+)
+
+router.post('/updateLevel',
+	Games.updateLevel,
+	(req, res) => {
+		const { new_level } = res.locals;
+		res.json({
+			new_level: new_level
+		});
+	}
+)
+
+router.post('/updateLastPlay',
+	Games.updateLastPlay,
+	(req, res) => {
+		const { new_last_play } = res.locals;
+		res.json({
+			new_last_play: new_last_play
+		});
+	}
+)
 
 module.exports = router;

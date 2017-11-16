@@ -8,26 +8,25 @@ Games.findAll = (req, res, next) => {
 			next();
 		})
 		.catch(err => {
-			console.log(`ERROR IN MODEL Games.findAll: ${err}`)
+			console.log(`ERROR IN MODEL Games.findAll:`, err)
 		});
 };
 
-Games.findById = (req, res, next) => {
-	const { id, user_level } = req.params;
-	
-	db.oneOrNone(`SELECT name, rules, hint, points_to_reach_level_${user_level}, nb_try_max_level_${user_level}
-					FROM games WHERE id=$1`, [id])
-		.then(game => {
-			res.locals.game = game
-			next();
-		})
-		.catch(err => {
-			console.log(`ERROR IN MODEL Games.findById: ${err}`)
-		});
-};
+// Games.findById = (req, res, next) => {
+// 	const { id, user_level } = req.params;
+// 
+// 	db.oneOrNone(`SELECT name, rules, hint, points_to_reach_level_${user_level}, nb_try_max_level_${user_level}
+// 					FROM games WHERE id=$1`, [id])
+// 		.then(game => {
+// 			res.locals.game = game
+// 			next();
+// 		})
+// 		.catch(err => {
+// 			console.log(`ERROR IN MODEL Games.findById:`, err)
+// 		});
+// };
 
 Games.renderQuestion = (req, res, next) => {
-	console.log('IN RENDER QUESTION');
 		const { id, user_level } = req.params;
 		
 		// games 5 & 6
@@ -49,7 +48,6 @@ Games.renderQuestion = (req, res, next) => {
 		// games 1 to 4 are about convertion
 		if ((parseInt(id) >= 1) && (parseInt(id) <= 4)) {
 					// define a parameter function of the level
-					console.log(11111);
 					const parameter = (parseInt(user_level)) * 10;
 					// define the question function of the parameter
 					question = Math.floor(Math.random() * parameter)+1;
@@ -99,7 +97,6 @@ Games.renderQuestion = (req, res, next) => {
 					// put the response inside the choices to pick
 					finalResponse = (Math.round(response*100))/100;
 					pick.push(finalResponse);
-					console.log('pick supposed to have 1 value', pick);
 
 					// create 8 others choices
 					for (let i = 1; i <= 5; i++) {
@@ -110,20 +107,14 @@ Games.renderQuestion = (req, res, next) => {
 							poss_response.push(finalResponse-i);
 						}
 					}
-					
-					console.log('poss_response supposed to have 8 values', poss_response);
-				
+									
 					// pick others numbers until there are 4 choices in pick
 					while (pick.length <= 3) {
 						const randomChoice = Math.floor(Math.random() * 7);
 						if (pick.indexOf(poss_response[randomChoice]) === -1) {
 							pick.push(poss_response[randomChoice]);
-							console.log('randomChoice', randomChoice);
-							console.log('poss_response', poss_response);
-							console.log('poss_response[randomChoice]', poss_response[randomChoice]);
 						}
 					}
-					console.log('pick supposed to have 4 values', pick);
 					
 					// create an array with 4 random numbers
 					while (order.length <= 3) {
@@ -132,18 +123,12 @@ Games.renderQuestion = (req, res, next) => {
 							order.push(randomOrder);
 						}
 					}
-					console.log('order supposed to have 4 values', order);
 					
 					// create an array with 4 choices in random order
 					for (let j = 0; j < order.length; j++) {
 						choice.push(pick[order[j]]);
 					}
-					console.log('choice supposed to have 4 values', choice);
 		}
-		console.log(2222);
-		console.log('fullQuestion',fullQuestion);
-		console.log('finalResponse',finalResponse);
-		console.log('choice',choice);
 		res.locals.question = {fullQuestion, finalResponse, choice};
 		next();
 
@@ -194,14 +179,53 @@ Games.renderQuestion = (req, res, next) => {
 	// })
 };
 
-// Games.oneLessTry = (req, res, next) => {
-// 	const { user_id } = req.body;
-// 	db.one('SELECT number_try_game FROM users WHERE id=$1', [parseInt(user_id)])
-// 		.then( number_try_game => {
-// 			res.locals.number_try_game = number_try_game;
-// 			next();
-// 		}).catch(err => {console.log(`err`)})
-// }
+Games.updateNumberTry = (req, res, next) => {
+	const { new_nb_try, user_id } = req.body;
+	db.one('UPDATE users SET number_try_game=$1 WHERE id=$2', [new_nb_try, parseInt(user_id)] )
+		.then( new_nb_try => {
+			res.locals.new_nb_try = new_nb_try;
+			next();
+		})
+		.catch(err => {
+			console.log(`ERROR IN MODEL Games.updateNumberTry:`, err)
+		});
+}
+
+Games.updateMaxScore = (req, res, next) => {
+	const { user_id, score, game_id } = req.body;
+	db.one(`UPDATE users SET max_score_game_${game_id}=$1 WHERE id=$2`, [score, parseInt(user_id)] )
+		.then( new_max_score => {
+			res.locals.new_max_score = new_max_score;
+			next();
+		})
+		.catch(err => {
+			console.log(`ERROR IN MODEL Games.updateMaxScore:`, err)
+		});
+}
+
+Games.updateLevel = (req, res, next) => {
+	const { user_id, user_level } = req.body;
+	db.one(`UPDATE users SET level=$1 WHERE id=$2`, [user_level, parseInt(user_id)] )
+		.then( new_level => {
+			res.locals.new_level = new_level;
+			next();
+		})
+		.catch(err => {
+			console.log(`ERROR IN MODEL Games.updateLevel:`, err)
+		});
+}
+
+Games.updateLastPlay = (req, res, next) => {
+	const { user_id, last_try } = req.body;
+	db.one(`UPDATE users SET last_try=$1 WHERE id=$2`, [last_try, parseInt(user_id)] )
+		.then( new_last_play => {
+			res.locals.new_last_play = new_last_play;
+			next();
+		})
+		.catch(err => {
+			console.log(`ERROR IN MODEL Games.updateLastPlay:`, err)
+		});
+}
 
 
 module.exports = Games

@@ -40,7 +40,7 @@ Games.renderQuestion = (req, res, next) => {
 		}
 
 		// games 1 to 4 are about convertion
-		if ((parseInt(id) >= 1) && (parseInt(id) <= 4)) {
+		if ( parseInt(id) <= 4 ) {
 					// define a parameter function of the level
 					const parameter = (parseInt(user_level)) * 10;
 					// define the question function of the parameter
@@ -48,7 +48,7 @@ Games.renderQuestion = (req, res, next) => {
 
 					// define the order of convertion
 					const side = ['US', 'EU'];
-					const randomSide = Math.floor(Math.random()) * 2;
+					const randomSide = Math.floor(Math.random() * 2);
 
 					if (parseInt(id) === 1) {
 					// 1°F = ( 1°C x 1.8 ) + 32 & 1°C = ( 1°F - 32 ) / 1.8
@@ -118,66 +118,42 @@ Games.renderQuestion = (req, res, next) => {
 					next();
 		
 		} else if (parseInt(id) === 5) {
-		// General Knowledge
-			console.log('IN GAME 5');
-			randomNum = user_level * 20;
-			random = Math.ceil(Math.random() * randomNum);
-			db.one(`SELECT * FROM knowledge WHERE level=$1 AND id=$2`, [user_level, random])
-			.then( questionData => {
-				pick = [questionData.response, questionData.possible_res_1, questionData.possible_res_2, questionData.possible_res_3];
-				for (let j = 0; j < order.length; j++) {
-					choice.push(pick[order[j]]);
-				}
-				fullQuestion = questionData.question;
-				finalResponse =  questionData.response;
-				console.log('fullQuestion', fullQuestion);
-				console.log('finalResponse', finalResponse);
-				console.log('choice', choice);
+			// General Knowledge
+				randomNum = user_level * 20;
+				random = Math.ceil(Math.random() * randomNum);
 				
-				res.locals.question = { fullQuestion, finalResponse, choice };
-				next();
-			});
-		} 
-		//else if (parseInt(id) === 6) {
-    // 
-		// 			console.log('IN GAME 6');
-		// 		// Flags
-		// 			randomNum = 14 * parseInt(user_level);
-		// 			random = Math.ceil(Math.random() * randomNum);
-    // 
-		// 			db.one('SELECT response FROM flags WHERE level=$1 AND id=$2', [parseInt(user_level), random])
-		// 			.then( question => {
-		// 				console.log('IN RESPONSE', question);
-		// 				res.locals.question = question;
-		// 				response = question;
-		// 				choice.push(response);
-		// 				const randomOrderChoice = Math.floor(Math.random() * 3);
-		// 				while (order.length <= 2) {
-		// 					if (order.indexOf(randomOrderChoice) === -1) {
-		// 						order.push(randomOrderChoice);
-		// 					}
-		// 				}
-		// 				for (let j = 1; j <= order.length; j++) {
-		// 					possible_res = `db.one('SELECT possible_res_${i} FROM flags WHERE level=$1 AND id=$2', [parseInt(user_level), random])`;
-		// 					choice.push(possible_res);
-		// 				}
-		// 				res.locals.choice = choice;
-		// 				next();
-		// 			})
-		// 			.catch(err => {
-		// 				console.log(`ERROR IN MODEL Games.renderQuestion 6: ${err}`)
-		// 			});	
-		// }
-	
-	// return { fullQuestion, choice }
-	// .then( fullBlockQuestion => {
-	// 		fullBlockQuestion = res.locals.question
-	// 		next();
-	// 	}
-	// ).catch(err => {
-	// 	console.log(`ERROR IN MODEL Games.renderQuestion: ${err}`)
-	// })
+				db.one(`SELECT * FROM knowledge WHERE level=$1 AND id=$2`, [user_level, random])
+				.then( questionData => {
+					
+					pick = [questionData.response, questionData.possible_res_1, questionData.possible_res_2, questionData.possible_res_3];
+					for (let j = 0; j < order.length; j++) {
+						choice.push(pick[order[j]]);
+					}
+					fullQuestion = questionData.question;
+					finalResponse =  questionData.response;
+					
+					res.locals.question = { fullQuestion, finalResponse, choice };
+					next();
+				});
+			} else if (parseInt(id) === 6) {
+	    // Flags
+				randomNum = user_level * 14;
+				random = Math.ceil(Math.random() * randomNum);
+	    
+					db.one('SELECT * FROM flags WHERE level=$1 AND id=$2', [user_level, random])
+					.then( questionData => {
+						
+						pick = [questionData.response, questionData.possible_res_1, questionData.possible_res_2, questionData.possible_res_3];
+						for (let j = 0; j < order.length; j++) {
+							choice.push(pick[order[j]]);
+						}
+						fullQuestion = questionData.response;
+						finalResponse =  questionData.response;
 
+						res.locals.question = { fullQuestion, finalResponse, choice };
+						next();
+					});
+			}
 	
 };
 

@@ -6,7 +6,6 @@ const Games = require('../models/game-model');
 router.get('/',
 	Games.findAll,
 	(req, res) => {
-		console.log('in games GET findAll');
 		const { allGames } = res.locals;
 		res.json({
 			allGames: allGames

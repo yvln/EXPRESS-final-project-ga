@@ -20,7 +20,6 @@ router.get('/validate',
 });
 
 router.post('/signup', (req, res) => {
-	console.log('IN POST SIGNUP');
   const email = req.body.email.toLowerCase();
   const {fname, lname, username, date_registr, password, password_confirmation, level, number_try_game, picture} = req.body;
 	const errors = {
@@ -34,7 +33,6 @@ router.post('/signup', (req, res) => {
   let error = false;
 	Object.keys(errors).forEach( key => {
 		if( !req.body[key] ){
-			console.log('VALUE TO KEY IS REQUIRED');
       errors[key].push(`${key} is required`);
       error = true;
     }
@@ -50,13 +48,11 @@ router.post('/signup', (req, res) => {
   }
 	User.findByEmail(email)
 		.then( resp => {
-			console.log('IN FIND BY EMAIL RESP');
 			if ( resp !== null ) {
 				errors.email.push("Email address already taken");
 				error = true;
 			}
 			if (!error){
-				console.log('NO ERROR');
 		    User
 		      .generateToken(User.create, fname, lname, email, username, date_registr, password, level, number_try_game, picture)
 		      .then(data => {
@@ -64,7 +60,6 @@ router.post('/signup', (req, res) => {
 		      })
 		      .catch(err => console.log(err))
 		  } else {
-				console.log('EROORS', errors);
 		    res.status(400).json({errors: errors})
 		  }
 		})

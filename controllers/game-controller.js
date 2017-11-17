@@ -23,6 +23,14 @@ router.get('/renderQuestion/:id/:user_level',
 	}
 );
 
+router.post('/newDay',
+	Games.newDay,
+	(req, res) => {
+		const { new_day } = res.locals;
+		res.send(new_day)
+	}
+);
+
 router.post('/updateNumberTry',
 	Games.updateNumberTry,
 	(req, res) => {

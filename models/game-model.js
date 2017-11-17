@@ -115,6 +115,7 @@ Games.renderQuestion = (req, res, next) => {
 						choice.push(pick[order[j]]);
 					}
 					res.locals.question = { fullQuestion, finalResponse, choice };
+					console.log(res.locals.question);
 					next();
 		
 		} else if (parseInt(id) === 5) {
@@ -122,7 +123,7 @@ Games.renderQuestion = (req, res, next) => {
 				randomNum = user_level * 20;
 				random = Math.ceil(Math.random() * randomNum);
 				
-				db.one(`SELECT * FROM knowledge WHERE level=$1 AND id=$2`, [user_level, random])
+				db.one(`SELECT * FROM knowledge WHERE id=$1`, [random])
 				.then( questionData => {
 					
 					pick = [questionData.response, questionData.possible_res_1, questionData.possible_res_2, questionData.possible_res_3];
@@ -140,7 +141,7 @@ Games.renderQuestion = (req, res, next) => {
 				randomNum = user_level * 14;
 				random = Math.ceil(Math.random() * randomNum);
 	    
-					db.one('SELECT * FROM flags WHERE level=$1 AND id=$2', [user_level, random])
+					db.one('SELECT * FROM flags WHERE id=$1', [random])
 					.then( questionData => {
 						
 						pick = [questionData.response, questionData.possible_res_1, questionData.possible_res_2, questionData.possible_res_3];
@@ -156,6 +157,18 @@ Games.renderQuestion = (req, res, next) => {
 			}
 	
 };
+
+Games.newDay = (req, res, next) => {
+	const { user_id } = req.body;
+	db.one('UPDATE users SET number_try_game=15 WHERE id=$1 RETURNING number_try_game', [ user_id ])
+		.then( new_day => {
+			res.locals.new_day = new_day;
+			next();
+		})
+		.catch(err => {
+			console.log(`ERROR IN MODEL Games.newDay:`, err)
+		});
+}
 
 Games.updateNumberTry = (req, res, next) => {
 	const { new_nb_try, user_id } = req.body;
@@ -182,8 +195,9 @@ Games.updateMaxScore = (req, res, next) => {
 }
 
 Games.updateLevel = (req, res, next) => {
-	const { user_id, user_level } = req.body;
-	db.one(`UPDATE users SET level=$1 WHERE id=$2 RETURNING level`, [user_level, user_id] )
+	const { user_level, user_id } = req.body;
+	db.one(`UPDATE users SET level=$1, max_score_game_1=$2, max_score_game_2=$2, max_score_game_3=$2, max_score_game_4=$2, max_score_game_5=$2, max_score_game_6=$2
+		 	WHERE id=$3 RETURNING *`, [user_level, 0, user_id] )
 		.then( new_level => {
 			res.locals.new_level = new_level;
 			next();

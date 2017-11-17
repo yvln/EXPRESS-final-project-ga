@@ -21,7 +21,14 @@ router.get('/validate',
 
 router.post('/signup', (req, res) => {
   const email = req.body.email.toLowerCase();
-  const {fname, lname, username, date_registr, password, password_confirmation, level, number_try_game, picture} = req.body;
+  const {fname, lname, username, date_registr, password, password_confirmation,
+		max_score_game_1,
+		max_score_game_2,
+		max_score_game_3,
+		max_score_game_4,
+		max_score_game_5,
+		max_score_game_6,
+		level, number_try_game, picture} = req.body;
 	const errors = {
 		fname: [],
 		lname: [],
@@ -54,7 +61,14 @@ router.post('/signup', (req, res) => {
 			}
 			if (!error){
 		    User
-		      .generateToken(User.create, fname, lname, email, username, date_registr, password, level, number_try_game, picture)
+		      .generateToken(User.create, fname, lname, email, username, date_registr, 
+						max_score_game_1,
+						max_score_game_2,
+						max_score_game_3,
+						max_score_game_4,
+						max_score_game_5,
+						max_score_game_6,
+						password, level, number_try_game, picture)
 		      .then(data => {
 		        res.json(data)
 		      })
@@ -83,6 +97,16 @@ router.post('/login', (req, res) => {
     });
 });
 
-// Quand signup avec un email existant => refuser
-	
+// User info
+
+router.get('/userinfo/:user_id',
+	User.findById,
+	(req, res) => {
+		const { data } = res.locals;
+		res.json({
+			data: data
+		})
+	}
+);
+
 module.exports = router;

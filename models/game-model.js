@@ -115,7 +115,6 @@ Games.renderQuestion = (req, res, next) => {
 						choice.push(pick[order[j]]);
 					}
 					res.locals.question = { fullQuestion, finalResponse, choice };
-					console.log(res.locals.question);
 					next();
 		
 		} else if (parseInt(id) === 5) {

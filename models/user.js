@@ -20,13 +20,34 @@ User.updateToken = (id, token) => {
     WHERE id = $2 RETURNING *`, [token, id]);
 };
 
-User.create = (fname, lname, email, username, date_registr, password, level, number_try_game, picture, token) => {
+User.create = (fname, lname, email, username, date_registr, 
+  max_score_game_1,
+  max_score_game_2,
+  max_score_game_3,
+  max_score_game_4,
+  max_score_game_5,
+  max_score_game_6,
+  password, level, number_try_game, picture, token) => {
   const password_digest = bcrypt.hashSync(password, 10);
   return db.one(`INSERT INTO users
-    (fname, lname, email, username, date_registr, password_digest, level, number_try_game, picture, token)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    (fname, lname, email, username, date_registr, 
+      max_score_game_1,
+      max_score_game_2,
+      max_score_game_3,
+      max_score_game_4,
+      max_score_game_5,
+      max_score_game_6,
+      password_digest, level, number_try_game, picture, token)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
     RETURNING *`,
-    [fname, lname, email, username, date_registr, password_digest, level, number_try_game, picture, token]);
+    [fname, lname, email, username, date_registr, 
+      max_score_game_1,
+      max_score_game_2,
+      max_score_game_3,
+      max_score_game_4,
+      max_score_game_5,
+      max_score_game_6,
+      password_digest, level, number_try_game, picture, token]);
 };
 
 User.findByEmail = (email) => {
@@ -36,5 +57,14 @@ User.findByEmail = (email) => {
 User.findByToken = (token) => {
 	return db.one('SELECT * FROM users WHERE token = $1', [token])
 };
+
+User.findById = (req, res, next) => {
+  const { user_id } = req.params 
+  db.one('SELECT * FROM users WHERE id = $1', [user_id])
+  .then ( data => {
+    res.locals.data = data;
+    next();
+  })
+}
 
 module.exports = User;

@@ -109,4 +109,12 @@ router.get('/userinfo/:user_id',
 	}
 );
 
+router.post('/userchanges',
+	User.updateProfile,
+	(req, res) => {
+		const { new_changes } = res.locals;
+		res.send(new_changes)
+	}
+);
+
 module.exports = router;

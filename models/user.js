@@ -58,11 +58,25 @@ User.findByToken = (token) => {
 	return db.one('SELECT * FROM users WHERE token = $1', [token])
 };
 
+
+// PROFILE USER 
+
 User.findById = (req, res, next) => {
   const { user_id } = req.params 
   db.one('SELECT * FROM users WHERE id = $1', [user_id])
   .then ( data => {
     res.locals.data = data;
+    next();
+  })
+}
+
+User.updateProfile = (req, res, next) => {
+  const { user_id, picture, username, fname, lname } = req.body 
+  db.one('UPDATE users SET picture=$1, username=$2, fname=$3, lname=$4 WHERE id = $5 RETURNING *',
+  [picture, username, fname, lname, user_id])
+  .then ( new_changes => {
+    console.log('new_changes', new_changes);
+    res.locals.new_changes = new_changes;
     next();
   })
 }

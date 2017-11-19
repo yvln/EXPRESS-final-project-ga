@@ -71,10 +71,12 @@ router.post('/signup', (req, res) => {
 						password, level, number_try_game, picture)
 		      .then(data => {
 		        res.json(data)
-		      })
-		      .catch(err => console.log(err))
+		      }).catch(err => {
+						console.log(err);
+						res.status(400).json({ error: {errors} });
+					})
 		  } else {
-		    res.status(400).json({errors: errors})
+		    res.status(400);
 		  }
 		})
 });
@@ -98,6 +100,31 @@ router.post('/login', (req, res) => {
 });
 
 // User info
+
+router.post('/authfb', (req, res) => {
+	User.findByEmail(req.body.email.toLowerCase())
+		.then( data => {
+			if (data) {
+				res.json(data)
+			} else {
+				const { email, name, picture } = req.body
+				const fname = name.split(' ')[0];
+				const lname = name.split(' ')[1];
+				const username = name.split(' ')[0];
+				let date = '';
+		    const year = new Date().getFullYear();
+		    const month = new Date().getMonth()+1;
+		    const day = new Date().getDate();
+		    date = `${year}-${month}-${day}`;
+				User.generateToken(
+					User.create, fname, lname, email, username, date, 0, 0, 0, 0, 0, 0, '', 1, 15, picture
+				).then( data => {
+					res.json(data)
+				})
+			}
+		})
+	}
+)
 
 router.get('/userinfo/:user_id',
 	User.findById,

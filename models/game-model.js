@@ -14,11 +14,11 @@ Games.findAll = (req, res, next) => {
 
 Games.renderQuestion = (req, res, next) => {
 		const { id, user_level } = req.params;
-		
+
 		// games 5 & 6
 		let randomNum = 0;
 		let random = 0;
-		
+
 		let getQuestion = null;
 
 		let question = null;
@@ -30,7 +30,7 @@ Games.renderQuestion = (req, res, next) => {
 		let pick = [];
 		const order = [];
 		const choice = [];
-		
+
 		// create an array with 4 random numbers
 		while (order.length <= 3) {
 			const randomOrder = Math.floor(Math.random() * 4);
@@ -101,7 +101,7 @@ Games.renderQuestion = (req, res, next) => {
 							poss_response.push(finalResponse-i);
 						}
 					}
-									
+
 					// pick others numbers until there are 4 choices in pick
 					while (pick.length <= 3) {
 						const randomChoice = Math.floor(Math.random() * 7);
@@ -109,29 +109,32 @@ Games.renderQuestion = (req, res, next) => {
 							pick.push(poss_response[randomChoice]);
 						}
 					}
-					
+
 					// create an array with 4 choices in random order
 					for (let j = 0; j < order.length; j++) {
-						choice.push(pick[order[j]]);
+						let partone = pick[order[j]].toString().split('.')[0];
+						let parttwo = pick[order[j]].toString().split('.')[1].substring(0,2) || '';
+						choice.push(`${partone}.${parttwo}`);
 					}
+					console.log(choice);
 					res.locals.question = { fullQuestion, finalResponse, choice };
 					next();
-		
+
 		} else if (parseInt(id) === 5) {
 			// General Knowledge
 				randomNum = user_level * 20;
 				random = Math.ceil(Math.random() * randomNum);
-				
+
 				db.one(`SELECT * FROM knowledge WHERE id=$1`, [random])
 				.then( questionData => {
-					
+
 					pick = [questionData.response, questionData.possible_res_1, questionData.possible_res_2, questionData.possible_res_3];
 					for (let j = 0; j < order.length; j++) {
 						choice.push(pick[order[j]]);
 					}
 					fullQuestion = questionData.question;
 					finalResponse =  questionData.response;
-					
+
 					res.locals.question = { fullQuestion, finalResponse, choice };
 					next();
 				});
@@ -139,10 +142,10 @@ Games.renderQuestion = (req, res, next) => {
 	    // Flags
 				randomNum = user_level * 14;
 				random = Math.ceil(Math.random() * randomNum);
-	    
+
 					db.one('SELECT * FROM flags WHERE id=$1', [random])
 					.then( questionData => {
-						
+
 						pick = [questionData.response, questionData.possible_res_1, questionData.possible_res_2, questionData.possible_res_3];
 						for (let j = 0; j < order.length; j++) {
 							choice.push(pick[order[j]]);
@@ -154,7 +157,7 @@ Games.renderQuestion = (req, res, next) => {
 						next();
 					});
 			}
-	
+
 };
 
 Games.newDay = (req, res, next) => {

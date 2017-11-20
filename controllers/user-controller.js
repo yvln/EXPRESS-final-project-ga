@@ -21,14 +21,7 @@ router.get('/validate',
 
 router.post('/signup', (req, res) => {
   const email = req.body.email.toLowerCase();
-  const {fname, lname, username, date_registr, password, password_confirmation,
-		max_score_game_1,
-		max_score_game_2,
-		max_score_game_3,
-		max_score_game_4,
-		max_score_game_5,
-		max_score_game_6,
-		level, number_try_game, picture} = req.body;
+  const {fname, lname, username, password, password_confirmation, picture} = req.body;
 	const errors = {
 		fname: [],
 		lname: [],
@@ -60,15 +53,14 @@ router.post('/signup', (req, res) => {
 				error = true;
 			}
 			if (!error){
+				const { email, fname, lname, username, picture } = req.body
+				let date = '';
+				const year = new Date().getFullYear();
+				const month = new Date().getMonth()+1;
+				const day = new Date().getDate();
+				date = `${year}-${month}-${day}`;
 		    User
-		      .generateToken(User.create, fname, lname, email, username, date_registr, 
-						max_score_game_1,
-						max_score_game_2,
-						max_score_game_3,
-						max_score_game_4,
-						max_score_game_5,
-						max_score_game_6,
-						password, level, number_try_game, picture)
+		      .generateToken(User.create, fname, lname, email, username, date, 0, 0, 0, 0, 0, 0, password, 1, 15, picture)
 		      .then(data => {
 		        res.json(data)
 		      }).catch(err => {
@@ -107,7 +99,8 @@ router.post('/authfb', (req, res) => {
 			if (data) {
 				res.json(data)
 			} else {
-				const { email, name, picture } = req.body
+				const email = req.body.email.toLowerCase();
+				const { name, picture } = req.body
 				const fname = name.split(' ')[0];
 				const lname = name.split(' ')[1];
 				const username = name.split(' ')[0];
